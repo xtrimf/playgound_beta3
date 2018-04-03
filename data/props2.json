@@ -1,0 +1,24 @@
+{
+  "AiYe":{
+     "Name":"Ai Ye",
+     "Temp":"Warm",
+     "Meridians":"KID,LIV,SP",
+     "Taste":"Acrid,Bitter",
+     "ChineseName":"艾葉",
+     "PinYin":"ài yè",
+     "PharmName":"Folium Artemesiae Argyi",
+     "Group":"Regulate the Blood",
+     "SubGroup":"Stop Bleeding"
+  },
+  "AnXiXiang":{
+     "Name":"An Xi Xiang",
+     "Temp":"Neutral",
+     "Meridians":"HT,LIV,SP",
+     "Taste":"Acrid,Bitter",
+     "ChineseName":"安息香",
+     "PinYin":"ān xī xiāng",
+     "PharmName":"Benzoinum",
+     "Group":"Open the Orifices",
+     "SubGroup":""
+  }
+}
