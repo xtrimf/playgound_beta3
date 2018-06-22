@@ -9,13 +9,17 @@ import App from './App.vue';
 import { sync } from 'vuex-router-sync'
 import {routes} from './routes.js';
 import {store} from './store/store';
-import BootstrapVue from 'bootstrap-vue'
+//import BootstrapVue from 'bootstrap-vue'
+import { Modal } from 'bootstrap-vue/es/components';
+
 import VueClipboard from 'vue-clipboard2';
+import VTooltip from 'v-tooltip'
 
 Vue.use(VueClipboard);
-Vue.use(BootstrapVue);
+Vue.use(Modal);
 Vue.use(VueRouter);
 Vue.use(VueResource);
+Vue.use(VTooltip);
 // Vue.use(BootstrapVue);
 //Vue.use(VueFire);
 //Vue.component(Multiselect)

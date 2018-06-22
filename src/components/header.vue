@@ -1,88 +1,39 @@
+
 <template lang="html">
-  <div>
-    <b-container fluid>
-    <b-navbar fluid fixed toggleable toggle-breakpoint="sm" type="light" variant="light">
-      <b-nav-toggle target="nav_text_collapse" position="right"></b-nav-toggle>
-      <b-navbar-brand><img src="../assets/icon.png" alt="logo" width="38px"></b-navbar-brand>
-      <b-navbar-brand>HerbaList Playground<sup>beta</sup></b-navbar-brand>
-      <b-collapse is-nav id="nav_text_collapse">
-            <b-nav b-navbar-nav>
-                <b-nav-item @click="newList" :disabled="!enableNew">New</b-nav-item>
-                <!-- <b-nav-item @click="saveData" :disabled="!canSave" style="padding-right: 0px">Save <b-badge v-show="this.$store.getters.revision>1" variant="secondary">{{this.$store.getters.revision}}</b-badge></b-nav-item> -->
-                <b-nav-item @click="saveData" :disabled="!canSave" style="padding-right: 0px">Save</b-nav-item>
-                <b-nav-item @click="saveData" :disabled="!enableNew" v-b-modal.shareModal>Share</b-nav-item>
-
-
-            </b-nav>
-        </b-collapse>
-  </b-navbar>
-  <div>
-    <!-- <b-btn v-b-modal.shareModal>Launch demo modal</b-btn> -->
-
-    <!-- Modal Component -->
-    <b-modal id="shareModal" ok-only title="Sharing options">
-      <div class="container">
-    <input type="text" v-model="message">
-    <button type="button"
-      v-clipboard:copy="message"
-      v-clipboard:success="onCopy"
-      v-clipboard:error="onError">Copy!</button>
+  <div class="header">
+    <div class="logo"><img :src="'/static/LogoBig.png'" alt="logo"></div>
+    <div class="new" @click="newList" :disabled="!enableNew"><label :class="{disabled: !enableNew, isActive: enableNew}">NEW</label></div>
+    <div class="save" @click="save(false)" :disabled="!canSave"><label :class="{disabled: !canSave, isActive: canSave}">SAVE</label></div>
+    <div class="share"
+         @click="save(true)"
+         :disabled="!enableNew"
+         ><label :class="{disabled: !enableNew, isActive: enableNew}">SHARE</label>
+    </div>
+    <modal
+      v-show="showShareModal"
+      @close="showShareModal = false"
+      :title = "saveORshare == 0 ? 'Formula saved!' : 'Sharing Options'"
+    />
   </div>
-      <p>{{this.$store.getters.url}}
-        
-      </p>
-      <p class="my-4"></p>
-      <!-- @focus="$event.target.select()" -->
-      <!-- AddToAny BEGIN -->
-      <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
-      <!-- Your share button code -->
-      <div
-           data-href="http://www.tcmherbalist.com"
-           data-layout="button"
-           data-size="large"
-           data-mobile-iframe="false">
-          <a class="fb-xfbml-parse-ignore"
-             target="_blank"
-             :href="['https://www.facebook.com/sharer/sharer.php?u='+this.$store.getters.url+'&amp;src=sdkpreparse']"
-             rel="nofollow noopener">
-             <span class="a2a_svg a2a_s__default a2a_s_facebook" style="background-color: rgb(59, 89, 152);">
-               <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                 <path fill="#FFF" d="M17.78 27.5V17.008h3.522l.527-4.09h-4.05v-2.61c0-1.182.33-1.99 2.023-1.99h2.166V4.66c-.375-.05-1.66-.16-3.155-.16-3.123 0-5.26 1.905-5.26 5.405v3.016h-3.53v4.09h3.53V27.5h4.223z"></path>
-               </svg>
-             </span>
-             <span class="a2a_label">Facebook</span>
-           </a>
-      </div>
-      <!-- <a class="a2a_dd" href="https://www.addtoany.com/share"></a> -->
-      <!-- <a class="a2a_button_email"></a> -->
-      <a class="a2a_button_google_gmail"></a>
-      <a v-if="isMobile" class="a2a_button_whatsapp"></a>
-      <a v-if="isMobile" class="a2a_button_wechat"></a>
-      </div>
-<!-- AddToAny END -->
-    </b-modal>
-  </div>
-  </b-container>
-
-
-</div>
 </template>
 
 <script>
-//import VueGoodshare from 'vue-goodshare';
+import Vue from 'vue';
+import modal from './modal';
 import {mapActions} from 'vuex';
 import _ from 'underscore';
 
 export default {
   data() {
     return{
-      isMobile: false,
-      message: 'Copy These Text'
+      message: 'Copy These Text',
+      showShareModal: false,
+      saveORshare: 0
     }
   },
-  // components:{
-  //   VueGoodshare
-  // },
+  components:{
+    modal
+  },
   computed:{
     canSave() {
       return this.$store.getters.enableSave
@@ -93,7 +44,7 @@ export default {
   },
   watch: {
     // call again the method if the route changes
-    '$route': 'loadData'
+    //'$route': 'loadData'
   },
   methods: {
     ...mapActions({
@@ -115,7 +66,8 @@ export default {
         this.$router.replace('/');
       }
     },
-    saveData() {
+    save(share) {
+        this.saveORshare = 0;
         if(this.canSave) {
         if(this.$store.getters.link==='') {  // generate new link if not exists
           var stringLength = 9;
@@ -134,27 +86,40 @@ export default {
 
         function saveData(thiss){
           // prepare the data payload
-          const data = {
-            maxrevision: thiss.$store.getters.revision,
-            ['rev'+thiss.$store.getters.revision]: {
-                revision: thiss.$store.getters.revision,
-                timestamp: new Date().toLocaleString(),
-                herbs: thiss.$store.getters.herbs
+          Vue.http.get('webdata/'+thiss.$store.getters.link+'/maxrevision.json') // get the latest version from firebase db
+            .then(response => response.json())
+            .then(res => {
+              console.log('res = '+res);
+              const maxRev = res+1;
+              const data = {
+                maxrevision: maxRev,
+                ['rev'+maxRev]: {
+                    revision: maxRev,
+                    timestamp: new Date().toLocaleString(),
+                    herbs: thiss.$store.getters.herbs
+                  }
+                };
+            // save the data
+            thiss.$http.patch('webdata/'+thiss.$store.getters.link+'.json', data) //patch is create or update
+            .then(res =>{
+              if(res.ok) {
+                thiss.$store.dispatch('saveToPrv');
+                // console.log(this.$store.getters.link+'/'+this.$store.getters.revision);
+                thiss.$router.replace('/'+thiss.$store.getters.link+'/'+maxRev);
+                thiss.share(share)
               }
-            };
-          // save the data
-          thiss.$http.patch('webdata/'+thiss.$store.getters.link+'.json', data) //patch is create or update
-          .then(res =>{
-            if(res.ok) {
-              thiss.$store.dispatch('saveToPrv');
-              // console.log(this.$store.getters.link+'/'+this.$store.getters.revision);
-              thiss.$router.replace('/'+thiss.$store.getters.link+'/'+thiss.$store.getters.revision);
-            }
-          });
-        }
+            });
+          }
+        )
       }
-    },
+    } else
+      { this.share(share)}
 
+    },
+    share(share){
+      this.saveORshare = share == true ? 1 : 0;
+      this.showShareModal = true
+    },
     loadData(){
         if(this.$route.params.rev!=undefined) {
           this.fetchData(this.$route.params);
@@ -183,6 +148,36 @@ export default {
 </script>
 
 <style lang="css">
+.header {
+  grid-template-columns: repeat(16,1fr);
+  grid-column-gap: 5px;
+  display: grid !important;
+}
+
+.header > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 500;
+  /* border: solid 1px; */
+}
+
+.logo{
+  grid-column: 1;
+}
+
+.new{
+  grid-column: 12
+
+}
+.save{
+  grid-column: 14
+
+}
+.share{
+  grid-column: 16
+}
 .badge{
   opacity: 0.60;
    position:relative;
@@ -191,15 +186,17 @@ export default {
 }
 .disabled {
   /* And disable the pointer events */
-  pointer-events: none;
+  /* pointer-events: none; */
 }
-
-.nav-link.disabled {
+.isActive {
+  cursor: pointer;
+}
+.disabled {
     color: rgba(155,155,155,0.4) !important;
 }
 
-.nav-link {
+/* .nav-link {
   padding-right: 20px !important;
-}
-.modal { display: block; }
+} */
+/* .modal { display: block; } */
 </style>

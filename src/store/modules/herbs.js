@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import emptyList from '../../data/herbsList.js';
 import emptyChart from '../../data/tempDistribution.js';
 import {router} from '../../main.js'
@@ -9,7 +10,7 @@ const state = {
   props:[],
   chart:[],
   link:'',
-  revision:1,
+  revision:0,
   loading: false
 };
 
@@ -30,7 +31,7 @@ const mutations = {
   },
   'ASSIGN_LINK' (state, link) {
     state.link = link;
-    state.revision = link===''? 1 : state.revision;
+    state.revision = link===''? 0 : state.revision;
   },
   'ADD_REVISION' (state) {
     ++state.revision
@@ -69,7 +70,6 @@ const mutations = {
   'SET_CHART2' (state) {
     // empty chart
     state.chart = emptyChart.map(item => {return {...item}}); // "deep" copy
-
     for ( var i = 0 ; i < state.herbs.length ; i++) { // loop through all herbs
       if (state.herbs[i].quantity > 0 ) {   // use only herbs with quantity > 0
         var t = getTemp(state.herbs[i].name); // get the temp for that herb
@@ -80,6 +80,7 @@ const mutations = {
           }
       }
     }
+
      // function to return herb temperature
      function getTemp(herb) {
        for (var i = 0 ; i < state.props.length ; i++) {

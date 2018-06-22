@@ -1,11 +1,12 @@
 <template lang="html">
   <div>
-      <table class="table table-sm table-condensed table-responsive table-hover table-bordered" style="background-color: white;">
+      <table class="herbsTable">
         <thead class="thead">
           <tr>
-            <th class="noBorder" scope="row">#</th>
-            <th class="noBorder" width="170px">Herb</th>
-            <th class="noBorder">
+            <th scope="row" width="39px"></th>
+            <th width="170px">Herb</th>
+            <th>
+              <div style="display: inline-flex !important;">
                 <multiselect  v-model="selectedProp"
                               label="name"
                               style="top: -2px; left: 5px; color: rgb(22,25,27)"
@@ -15,17 +16,18 @@
                               :show-no-results="false"
                               :show-labels="false">
                     </multiselect>
+                </div>
             </th>
             <th width="65px">Quan'</th>
             <!-- <th width="50px">Unit</th> -->
-            <th width="135px" class="noBorder">Temp'</th>
-            <th id="Tx" width="30px" class="noBorder" v-b-tooltip title="Toxicity">Tx</th>
-            <th width="30px" class="noBorder" v-b-tooltip title="Pregnancy Contra-Indication">PCI</th>
-            <th width="10px" class="noBorder"></th>
+            <th width="188px" class="noBorder">Temp'</th>
+            <th id="Tx">Toxicity</th>
+            <th id="PCI">PCI</th>
+            <th width="70px">Remove</th>
           </tr>
         </thead>
-        <tbody>
-          <app-herb v-for="herb in herbs" :herb="herb" :selectedProp="selectedProp.value" :key="herb.key"></app-herb>
+        <tbody name="fade" is="transition-group" mode="out-in">
+          <app-herb v-for="herb in herbs"  @event1="showComments" :herb="herb" :selectedProp="selectedProp.value" :key="herb.key"></app-herb>
         </tbody>
       </table>
   </div>
@@ -88,74 +90,53 @@ export default {
     }
   },
   updated() {
-    
+
   }
 };
 </script>
 
-<style lang="css">
-th {
+<style src="../../assets/css/multiSelect.css"></style>
+<style lang="css" >
+
+.herbsTable {
+  width: 100%;
+  /* height: 100%; */
+  opacity: 0.9;
+  background-color: white;
+  border-collapse:collapse;
+  /* height: 450px; */
+}
+.herbsTable th {
   text-align: center;
   padding: 0.1rem !important;
+  font-size: 18px;
+  height: 40px;
+  font-weight: 500;
 }
 
-td {
-  padding: 0.1rem 0.3rem 0.1rem 0.3rem !important;
-}
-.multiselect__tags {
-  border: none;
-  background: transparent;
-  min-height: 30px !important;
-  max-height: 30px !important;
-
-}
-.multiselect {
-  font-size: inherit !important;
-  min-height: 30px !important;
-  max-height: 30px !important;
-  /*top: 8px;*/
-}
-.multiselect__content.multiselect__option{
-  min-height: 30px !important;
-  max-height: 30px !important;
-
-}
-.multiselect__element {
-  font-size: 14px !important;
-  min-height: 30px !important;
-  max-height: 30px !important;
-}
-.multiselect__select{
-  min-height: 30px !important;
-  max-height: 30px !important;
+.herbsTable td {
+  /* padding: 0.1rem 0.3rem 0.1rem 0.3rem !important; */
+  line-height: 41px;
+  /* box-sizing: border-box; */
+  border: solid 1px #D0D0D0 ;
+  /* height: 1px;
+  border: 1px
+  solid #D0D0D0; */
 }
 
-.multiselect__single{
-  background: transparent;
-  font-size: inherit !important;
-}
-.multiselect__option.multiselect__option--highlight{
-  background: rgb(221,221,221);
-  color: rgb(50,50,50);
-  font-size: 14px !important;
-  min-height: 30px !important;
-  max-height: 30px !important;
-
-}
-
-.noBorder{
-  border-left: transparent !important;
-  border-right: transparent !important;
-}
-
-/*.table-responsive {
-  overflow: inherit !important;
-}*/
-/* this is for the awesomelete*/
-mark{
+/* mark{
     background-color:transparent !important;
     font-weight: bold;
     padding:0;
     margin:0;
+} */
+</style>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .2s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 </style>

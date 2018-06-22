@@ -4,7 +4,7 @@ import {router} from '../main.js'
 import _ from 'lodash';
 
 export const LoadData = ({dispatch,commit},params) => {
-
+  //console.log('loading data...');
    commit('SET_LOAD_STATUS', true);
   //get herbs
     //console.log('getting herbs from server...');
@@ -41,7 +41,6 @@ export const LoadData = ({dispatch,commit},params) => {
       }
     });
 };
-
 
 export const GetHerbProps = ({dispatch,commit,state},herb) => {
   if(herb != '' && _.find(state.herbs.props, ['Name', herb]) == undefined) { // make sure we don't have already
